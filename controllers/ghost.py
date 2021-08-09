@@ -27,7 +27,6 @@ app = Flask(__name__)
 @torch.no_grad()
 def runInference(inboundfilefullpath,
                  weights='weights/best.pt',  # model.pt path(s)
-                 imgsz=416,  # inference size (pixels)
                  conf_thres=0.25,  # confidence threshold
                  iou_thres=0.45,  # NMS IOU threshold
                  max_det=10,  # maximum detections per image
@@ -45,6 +44,8 @@ def runInference(inboundfilefullpath,
     global model
     global stride
     global dataset
+    imgsz = 416
+
     results = ''
 
     # Directories
@@ -59,13 +60,12 @@ def runInference(inboundfilefullpath,
     if init:
         model = attempt_load(weights, map_location=device)  # load FP32 model
         stride = int(model.stride.max())  # model stride
+        imgsz = check_img_size(imgsz, s=stride)  # check image size
+        model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
+        names = model.module.names if hasattr(model, 'module') else model.names  # get class names
 
-    imgsz = check_img_size(imgsz, s=stride)  # check image size
-    model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
-    names = model.module.names if hasattr(model, 'module') else model.names  # get class names
-
-    if half:
-    	model.half()  # to FP16
+        if half:
+    	    model.half()  # to FP16
 
     dataset = LoadImages(inboundfilefullpath, img_size=imgsz, stride=stride)
     init = False
