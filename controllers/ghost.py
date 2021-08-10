@@ -137,11 +137,12 @@ def deleteinbound(path):
 def print_filename():
     file = request.files['file']
     filename=secure_filename(file.filename)
-    file.save('/home/bob/inference/inbound/' + filename)
-    print('saved: ' + '/home/bob/inference/inbound/' + filename)
-    print('running inference: ' + '/home/bob/inference/inbound/' + filename)
-    result = runInference('/home/bob/inference/inbound/' + filename)
-    print('done inference: ' + '/home/bob/inference/inbound/' + filename)
+    file.save('/mnt/ramdisk/inbound/' + filename)
+    print('saved: ' + '/mnt/ramdisk/inbound/' + filename)
+    print('running inference: ' + '/mnt/ramdisk/inbound/' + filename)
+    result = runInference('/mnt/ramdisk/inbound/' + filename)
+
+    print('done inference: ' + '/mnt/ramdisk/inbound/' + filename)
     print('result: ' + result)
 
     return result
